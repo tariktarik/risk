@@ -1,0 +1,37 @@
+version: '3.8'
+services:
+  wellbp-postgres:
+    image: postgres:alpine
+    restart: unless-stopped
+    container_name: wellbp-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=wellbp
+    ports:
+      - 5434:5432
+    volumes:
+      - db:/var/lib/postgres
+
+  wellbp:
+    depends_on:
+      - wellbp-postgres
+    image: wellbp
+    container_name: wellbp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - /app/node_modules
+      - .:/app
+
+volumes:
+  db:
+
+networks:
+  internal:
